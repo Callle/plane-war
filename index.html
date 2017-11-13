@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .myplan {
+            background: url("image/myplan.gif") no-repeat center;
+            width: 66px;
+            height: 80px;
+            position: absolute;
+        }
+
+        .bullet {
+            background: url("image/bullet1.png") no-repeat center;
+            width: 6px;
+            height: 14px;
+            position: absolute;
+        }
+
+        .enemy1 {
+            background: url("image/enemy1_fly_1.png") no-repeat center;
+            width: 34px;
+            height: 24px;
+            position: absolute;
+        }
+
+        .enemy2 {
+            background: url("image/enemy2_fly_1.png") no-repeat center;
+            width: 110px;
+            height: 164px;
+            position: absolute;
+        }
+
+        .enemy3 {
+            background: url("image/enemy3_fly_1.png") no-repeat center;
+            width: 46px;
+            height: 60px;
+            position: absolute;
+        }
+        .font{
+            font-size: 50px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -25px;
+            margin-top: -25px;
+        }
+    </style>
+
+    <script>
+        window.onload = function () {
+            var myplan = document.createElement('div');
+            var font = document.getElementsByClassName('font')[0];
+            myplan.className = 'myplan';
+            document.body.appendChild(myplan);
+
+            window.onmousemove = function (e) {
+                myplan.style.left = e.clientX - 33 + 'px';
+                myplan.style.top = e.clientY - 40 + 'px';
+                var enemys = document.getElementsByClassName('enemy1');
+                for (var i = 0; i < enemys.length; i++) {
+                    if (impact(myplan, enemys[i])) {
+                        clearInterval(enemys[i].time);
+                        clearInterval(bulletTime);
+                        clearInterval(enemyTime);
+                        enemys[i].style.background = 'url("image/小飞机爆炸.gif")';
+                        myplan.style.background = 'url("image/本方飞机爆炸.gif")';
+                        setTimeout(function () {
+                            document.body.removeChild(enemys[i]);
+                            document.body.removeChild(myplan);
+                            alert("Game Over \n 分数："+ font.innerHTML);
+                        }, 300);
+                        window.onmousemove = null;
+                        break;
+                    }
+                }
+            }
+
+            var bulletTime = setInterval(function () {
+                var bullet = document.createElement('div');
+                bullet.className = 'bullet';
+                document.body.appendChild(bullet);
+                bullet.style.left = myplan.offsetLeft + 30 + 'px';
+                bullet.style.top = myplan.offsetTop - 14 + 'px';
+                bullet.time = setInterval(function () {
+                    bullet.style.top = bullet.offsetTop - 10 + 'px';
+                    if (bullet.offsetTop <= -14) {
+                        clearInterval(bullet.time);
+                        document.body.removeChild(bullet);
+                    }
+                }, 30)
+            }, 300)
+
+            var enemyTime = setInterval(function () {
+                var enemy = document.createElement('div');
+                enemy.className = 'enemy1';
+                enemy.height = 24;
+                enemy.width = 34;
+                enemy.score = 100;
+                document.body.appendChild(enemy);
+                randomEnemy(enemy, enemy.width, enemy.height);
+                enemy.time = setInterval(function () {
+                    enemy.style.top = enemy.offsetTop + 10 + 'px';
+                    if (enemy.offsetTop >= screen.availHeight + enemy.offsetHeight) {
+                        clearInterval(enemy.time);
+                        document.body.removeChild(enemy);
+                    }
+                    var bullets = document.getElementsByClassName('bullet');
+                    for (var i = 0; i < bullets.length; i++) {
+                        if (impact(bullets[i], enemy)) {
+                            clearInterval(bullets[i].time);
+                            document.body.removeChild(bullets[i]);
+                            clearInterval(enemy.time);
+                            enemy.style.background = 'url("image/小飞机爆炸.gif")';
+                            setTimeout(function () {
+                                document.body.removeChild(enemy);
+                            }, 300);
+                            var score = +font.innerHTML;
+                            score += +enemy.score;
+                            font.innerHTML = score;
+                            break;
+                        }
+                    }
+                }, 90)
+
+
+            }, 500)
+
+
+            function randomEnemy(ele, wigth, height) {
+                var rad = Math.round(Math.random() * (screen.availWidth - wigth));
+                ele.style.left = rad + 'px';
+                ele.style.top = '-' + height + 'px';
+            }
+
+
+        }
+    </script>
+    <script src="tool.js"></script>
+</head>
+<body style='background: url("image/background_1.png")'>
+<div class="font">
+    000
+</div>
+</body>
+</html>
